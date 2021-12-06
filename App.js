@@ -48,10 +48,15 @@ export default function App() {
   const [coinGraphiccList, setCoinGraphicList] = useState([0]);
   const [days, setDays] = useState(30);
   const [updateData, setUpdateData] = useState(true);
+  const [price, setPrice] = useState()
 
   function updateDay(number) {
     setDays(number);
     setUpdateData(true);
+  }
+
+  function priceCotation() {
+    setPrice(coinGraphiccList.pop());
   }
 
   useEffect(() => {
@@ -62,6 +67,7 @@ export default function App() {
       setCoinGraphicList(dataG)
     });
 
+    priceCotation();
     if(updateData){
       setUpdateData(false);
 
@@ -76,7 +82,7 @@ export default function App() {
         backgroundColor="#c3ac18"
         barStyle="light-content" />
 
-        <CurrentPrice />
+        <CurrentPrice lastCotation={price} />
         <HistoryGraphic infoDataGraphic={coinGraphiccList} />
         <QuotationList filterDay={updateDay} listTransition={coinList} />
         
