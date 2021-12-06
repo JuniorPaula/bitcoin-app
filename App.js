@@ -48,7 +48,7 @@ export default function App() {
   const [coinGraphiccList, setCoinGraphicList] = useState([0]);
   const [days, setDays] = useState(30);
   const [updateData, setUpdateData] = useState(true);
-  const [price, setPrice] = useState()
+  const [price, setPrice] = useState('')
 
   function updateDay(number) {
     setDays(number);
