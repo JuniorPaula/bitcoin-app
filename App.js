@@ -1,11 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, StatusBar, SafeAreaView, Platform } from 'react-native';
 import CurrentPrice from './src/components/CurrentPrice';
 import HistoryGraphic from './src/components/HistoryGraphic';
 import QuotationList from './src/components/QuotationList';
 import QuotationsItems from './src/components/QuotationList/QuotationsItems';
 
+function addZero(number) {
+  if(number <= 9) return `0${number}`;
+  return number;
+}
+
+function url(qdtDays) {
+  const date = new Date();
+  const listLastDays = qdtDays;
+  const endDate = `${date.getFullYear()}-${addZero(date.getMonth() + 1)}-${addZero(date.getDate())}`;
+  date.setDate(date.getDate() - listLastDays);
+  const startDate = `${date.getFullYear()}-${addZero(date.getMonth() + 1)}-${addZero(date.getDate())}`;
+  return `https://api.coindesk.com/v1/bpi/historical/close.json?start=${startDate}&end${endDate}`
+}
+
+async function getListCoins(url) {
+  let response = await fetch(url);
+  let returnApi = await response.json()
+  let selectListQuotations = returnApi.bpi;
+  const queryCoinList = Object.keys(selectListQuotations).map((key) => {
+    return {
+      data: key.split('-').reverse().join('/'),
+      valor: selectListQuotations[key]
+    }
+  });
+  let data = queryCoinList;
+  return data;
+}
+
+async function getPriceCoinGraphic(url) {
+  let responseG = await fetch(url);
+  let returnApiG = await responseG.json()
+  let selectListQuotationsG = returnApiG.bpi;
+  const queryCoinList = Object.keys(selectListQuotationsG).map((key) => {    
+    selectListQuotationsG[key]   
+  });
+  let dataG = queryCoinList.reverse();
+  return dataG;
+}
+
 export default function App() {
+  const [coinList, setCoinList] = useState([]);
+  const [coinGraphiccList, setCoinGraphicList] = useState([0]);
+  const [days, setDays] = useState(30);
+  const [updateData, setUpdateData] = useState(true);
+
+  const updateDay = (number) => {
+    setDays(number);
+    setUpdateData(true);
+  }
+
+  useEffect(() => {
+    getListCoins(url(days)).then((data) => setCoinList(data));
+    getPriceCoinGraphic(url(days)).then((dataG) => setCoinGraphicList(dataG));
+
+    if(updateData) setUpdateData(false);
+  },[updateData]);
+
+
   return (
     <SafeAreaView style={styles.container}>
       
