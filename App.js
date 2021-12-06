@@ -3,7 +3,6 @@ import { StyleSheet, StatusBar, SafeAreaView, Platform } from 'react-native';
 import CurrentPrice from './src/components/CurrentPrice';
 import HistoryGraphic from './src/components/HistoryGraphic';
 import QuotationList from './src/components/QuotationList';
-import QuotationsItems from './src/components/QuotationList/QuotationsItems';
 
 function addZero(number) {
   if(number <= 9) return `0${number}`;
@@ -14,9 +13,9 @@ function url(qdtDays) {
   const date = new Date();
   const listLastDays = qdtDays;
   const endDate = `${date.getFullYear()}-${addZero(date.getMonth() + 1)}-${addZero(date.getDate())}`;
-  date.setDate(date.getDate() - listLastDays);
+  date.setDate(date.getDate() - listLastDays)
   const startDate = `${date.getFullYear()}-${addZero(date.getMonth() + 1)}-${addZero(date.getDate())}`;
-  return `https://api.coindesk.com/v1/bpi/historical/close.json?start=${startDate}&end${endDate}`
+  return `https://api.coindesk.com/v1/bpi/historical/close.json?start=${startDate}&end=${endDate}`
 }
 
 async function getListCoins(url) {
@@ -29,7 +28,7 @@ async function getListCoins(url) {
       valor: selectListQuotations[key]
     }
   });
-  let data = queryCoinList;
+  let data = queryCoinList.reverse();
   return data;
 }
 
@@ -38,9 +37,9 @@ async function getPriceCoinGraphic(url) {
   let returnApiG = await responseG.json()
   let selectListQuotationsG = returnApiG.bpi;
   const queryCoinList = Object.keys(selectListQuotationsG).map((key) => {    
-    selectListQuotationsG[key]   
+   return selectListQuotationsG[key]   
   });
-  let dataG = queryCoinList.reverse();
+  let dataG = queryCoinList;
   return dataG;
 }
 
@@ -50,16 +49,23 @@ export default function App() {
   const [days, setDays] = useState(30);
   const [updateData, setUpdateData] = useState(true);
 
-  const updateDay = (number) => {
+  function updateDay(number) {
     setDays(number);
     setUpdateData(true);
   }
 
   useEffect(() => {
-    getListCoins(url(days)).then((data) => setCoinList(data));
-    getPriceCoinGraphic(url(days)).then((dataG) => setCoinGraphicList(dataG));
+    getListCoins(url(days)).then((data) =>{ 
+      setCoinList(data)
+    });
+    getPriceCoinGraphic(url(days)).then((dataG) =>{ 
+      setCoinGraphicList(dataG)
+    });
 
-    if(updateData) setUpdateData(false);
+    if(updateData){
+      setUpdateData(false);
+
+    } 
   },[updateData]);
 
 
@@ -72,8 +78,8 @@ export default function App() {
 
         <CurrentPrice />
         <HistoryGraphic />
-        <QuotationList />
-        <QuotationsItems />
+        <QuotationList filterDay={updateDay} listTransition={coinList} />
+        
     </SafeAreaView>
   );
 }
